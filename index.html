@@ -23,5 +23,42 @@
         
 </body>
     
+<script>
+function initCanvas(){
+    var ctx = document.getElementById('mycanvas').getContext('2d');
+    var canvasW = ctx.canvas.width, canvasH = ctx.canvas.height;
+    
+    //This code is to create the boxes that will be falling on the canvas and that you will have to shoot
+    //Each Box has their own X and Y co-ordinates with h being the height of the animated object
+    var box = [     {"id":"BOX 1","x":230,"y":-20,"w":50,"h":10},
+                    {"id":"BOX 2","x":330,"y":-20,"w":50,"h":10},
+                    {"id":"BOX 3","x":430,"y":-20,"w":50,"h":10},
+                    {"id":"BOX 4","x":230,"y":-70,"w":50,"h":10},
+                    {"id":"BOX 5","x":330,"y":-70,"w":50,"h":10},
+                    {"id":"BOX 7","x":430,"y":-70,"w":50,"h":10},
+                    {"id":"BOX 8","x":230,"y":-120,"w":50,"h":10},
+                    {"id":"BOX 9","x":330,"y":-120,"w":50,"h":10},
+                    {"id":"BOX 10","x":430,"y":-120,"w":50,"h":10}
+    ];
+    
+    //This function sets the colour of the boxes falling it also sets the speed of which they fall using the ctx.fillRect
+    function renderBox(){
+        for(var i = 0; i < box.length; i++){
+            ctx.fillStyle = "green";
+            ctx.fillRect(box[i].x, box[i].y+=1, box[i].w, box[i].h);
+        }
+    }
+    
+    //Here this code is used for the gun and the making of the gun
+     var gun = new Gun();
+    function animate(){
+        ctx.clearRect(0, 0, canvasW, canvasH);
+        gun.render();
+        renderBox();
+    }
+    
+    
+</script>
+    
 </head>
 </html>
