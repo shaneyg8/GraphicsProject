@@ -2,25 +2,25 @@
 <html>
 <head>
 <style>
-    
     * { padding: 0; margin: 0; }
     	#mycanvas { background:url(background.jpg); display: block; margin: 0 auto; }
     body{ margin:10px; background:url(b2.png) }
 
 </style>
-    <!-- Above showed use of CSS here i set the background to the images in the folder -->
+    
     <body>
         <!--Canvas width and Height set here-->
 <canvas id="mycanvas" width="700" height="450"></canvas>
         
 <div style = "text-align:center" >
     
-    <!--Here are the names of the buttons underneath the canvas that are used to move the object id matching the code to follow beneath-->
+    <!--Here are the names of the buttons underneath the canvas that are used to move the object id matching the code beneath-->
   <button id="leftButton">Move Left</button>
   <button id="rightButton">Move Right</button>
   <button id="fireButton">Fire Missile</button>
 </div>
         
+<h3 id="status"></h3>
 </body>
     
 <script>
@@ -48,17 +48,81 @@ function initCanvas(){
             ctx.fillRect(box[i].x, box[i].y+=1, box[i].w, box[i].h);
         }
     }
-    
-    //Here this code is used for the gun and the making of the gun
-     var gun = new Gun();
+    var gun = new Gun();
     function animate(){
+        //ctx.save();
         ctx.clearRect(0, 0, canvasW, canvasH);
         gun.render();
         renderBox();
+        //ctx.restore();
     }
-    
-    
+    //Button movement
+    //We set variables and an element id so the id can be linked to the top of this code e.g id = etc..
+    var animateInterval = setInterval(animate, 30); 
+    var leftButton = document.getElementById('leftButton');
+    var rightButton = document.getElementById('rightButton');
+    var fireButton = document.getElementById('fireButton');
+    leftButton.addEventListener('mousedown', function(event) {
+        gun.dir = 'left';
+    });
+    leftButton.addEventListener('mouseup', function(event) { //The addEventListener is used to register the specified listener
+        gun.dir = '';
+    });
+    rightButton.addEventListener('mousedown', function(event) {
+        gun.dir = 'right';
+    });
+    rightButton.addEventListener('mouseup', function(event) {
+        gun.dir = '';
+    });
+    fireButton.addEventListener('mousedown', function(event) {
+        gun.bullets.push({"x":gun.x+gun.w*.5,"y":gun.y,"w":3,"h":10,"bg":"red"}); 
+    });
+    //Here is the code for the gun
+    //The speed, Height and Width is set here given the function Gun()
+    function Gun(){
+        this.y = 420, this.x = canvasW*.5-25, this.w = 20, this.h = 30, this.dir, this.bg="blue", this.bullets = []; // also sets colour of gun
+        this.render = function(){
+            if(this.dir == 'left'){
+                this.x-=5;
+            } else if(this.dir == 'right'){
+                this.x+=5;
+            }
+            ctx.fillStyle = this.bg;
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+            for(var i=0; i < this.bullets.length; i++){
+                var m = this.bullets[i];
+                ctx.fillStyle = m.bg;
+                ctx.fillRect(m.x, m.y-=5, m.w, m.h);
+                this.hitDetect(this.bullets[i],i);
+                if(m.y <= 0){ // If a bullets goes past the canvas boundaries, remove it
+                    this.bullets.splice(i,1); // The splice method adds/removes items (so here being the bullets) to/from an array, and returns the removed item.
+                }
+            }
+            if(box.length == 0){
+                clearInterval(animateInterval); // Stops the game animation loop
+                ctx.fillStyle = '#FC0';
+                ctx.font = 'italic bold 36px Arial, sans-serif';//Font type and size
+                ctx.fillText('Game Complete', canvasW*.5-130, 50, 300); //If all boxes are hit this message will appear
+            }
+        }
+        
+        //When a box gets hit
+        this.hitDetect = function(m,mi){
+            for(var i = 0; i < box.length; i++){
+                var e = box[i];
+                if(m.x+m.w >= e.x && m.x <= e.x+e.w && m.y >= e.y && m.y <= e.y+e.h){
+                    this.bullets.splice(this.bullets[mi],1); // Removes the bullets when they hit the  box
+                    box.splice(i,1); // Remove the enemy that the bullets hit
+                    document.getElementById('status').innerHTML = "You Killed "+ e.id; //Tags for when you hit the boxes, positioned on the left
+                }
+            }
+        }
+    }
+}
+window.addEventListener('load', function(event) {
+    initCanvas();
+});
 </script>
-    
 </head>
+<body> 
 </html>
